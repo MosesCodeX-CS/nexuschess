@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import jwt, { SignOptions } from 'jsonwebtoken'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
@@ -13,12 +13,12 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 }
 
 export function generateToken(userId: string, email: string): string {
-  return jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
+  return jwt.sign({ userId, email }, JWT_SECRET as string, { expiresIn: '7d' })
 }
 
 export function verifyToken(token: string): { userId: string; email: string } | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as { userId: string; email: string }
+    return jwt.verify(token, JWT_SECRET as string) as { userId: string; email: string }
   } catch {
     return null
   }

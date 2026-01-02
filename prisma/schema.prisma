@@ -8,138 +8,139 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
-  username          String    @unique
-  password          String
-  chesscomUsername  String?   @unique
-  chesscomVerified  Boolean   @default(false)
-  rating            Int       @default(1200)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
-  games             Game[]
-  profile           Profile?
-  weaknesses        Weakness[]
-  puzzleAttempts    PuzzleAttempt[]
+  id               String   @id @default(cuid())
+  email            String   @unique
+  username         String   @unique
+  password         String
+  chesscomUsername String?  @unique
+  chesscomVerified Boolean  @default(false)
+  rating           Int      @default(1200)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  games          Game[]
+  profile        Profile?
+  weaknesses     Weakness[]
+  puzzleAttempts PuzzleAttempt[]
 }
 
 model Profile {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  playstyle         String?  
-  openingSkill      Int      @default(1200)
-  middlegameSkill   Int      @default(1200)
-  endgameSkill      Int      @default(1200)
-  tacticalRating    Int      @default(1200)
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  playstyle       String?
+  openingSkill    Int     @default(1200)
+  middlegameSkill Int     @default(1200)
+  endgameSkill    Int     @default(1200)
+  tacticalRating  Int     @default(1200)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Game {
-  id                String    @id @default(cuid())
-  userId            String
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  pgn               String    @db.Text
-  result            String    
-  playerColor       String    
-  opponent          String
-  opponentRating    Int?
-  timeControl       String
-  date              DateTime
-  chesscomId        String?   @unique
-  
-  opening           String?
-  openingEco        String?
-  accuracy          Float?
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
-  analysis          Analysis?
-  mistakes          Mistake[]
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  pgn            String   @db.Text
+  result         String
+  playerColor    String
+  opponent       String
+  opponentRating Int?
+  timeControl    String
+  timeClass      String? // blitz, rapid, bullet, daily, etc.
+  date           DateTime
+  chesscomId     String?  @unique
+
+  opening    String?
+  openingEco String?
+  accuracy   Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  analysis Analysis?
+  mistakes Mistake[]
 }
 
 model Analysis {
-  id                String    @id @default(cuid())
-  gameId            String    @unique
-  game              Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  
-  engineDepth       Int
-  averageAccuracy   Float
-  blunders          Int
-  mistakes          Int
-  inaccuracies      Int
-  brilliantMoves    Int
-  
-  openingPhase      Json      
-  middlegamePhase   Json
-  endgamePhase      Json
-  
-  createdAt         DateTime  @default(now())
+  id     String @id @default(cuid())
+  gameId String @unique
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  engineDepth     Int
+  averageAccuracy Float
+  blunders        Int
+  mistakes        Int
+  inaccuracies    Int
+  brilliantMoves  Int
+
+  openingPhase    Json
+  middlegamePhase Json
+  endgamePhase    Json
+
+  createdAt DateTime @default(now())
 }
 
 model Mistake {
-  id                String    @id @default(cuid())
-  gameId            String
-  game              Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  
-  moveNumber        Int
-  fen               String    @db.Text
-  playedMove        String
-  bestMove          String
-  evaluation        Float
-  previousEval      Float
-  severity          String    
-  phase             String    
-  theme             String?   
-  explanation       String?   @db.Text
-  
-  createdAt         DateTime  @default(now())
+  id     String @id @default(cuid())
+  gameId String
+  game   Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  moveNumber   Int
+  fen          String  @db.Text
+  playedMove   String
+  bestMove     String
+  evaluation   Float
+  previousEval Float
+  severity     String
+  phase        String
+  theme        String?
+  explanation  String? @db.Text
+
+  createdAt DateTime @default(now())
 }
 
 model Weakness {
-  id                String    @id @default(cuid())
-  userId            String
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  category          String    
-  subcategory       String    
-  frequency         Int
-  severity          Float
-  lastOccurred      DateTime
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  category     String
+  subcategory  String
+  frequency    Int
+  severity     Float
+  lastOccurred DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([userId, category, subcategory])
 }
 
 model Puzzle {
-  id                String    @id @default(cuid())
-  fen               String    @db.Text
-  solution          String[]
-  theme             String[]
-  difficulty        Int
-  rating            Int
-  
-  attempts          PuzzleAttempt[]
+  id         String   @id @default(cuid())
+  fen        String   @db.Text
+  solution   String[]
+  theme      String[]
+  difficulty Int
+  rating     Int
+
+  attempts PuzzleAttempt[]
 }
 
 model PuzzleAttempt {
-  id                String    @id @default(cuid())
-  userId            String
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  puzzleId          String
-  puzzle            Puzzle    @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
-  
-  solved            Boolean
-  timeSpent         Int       
-  attempts          Int
-  
-  createdAt         DateTime  @default(now())
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  puzzleId String
+  puzzle   Puzzle @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
+
+  solved    Boolean
+  timeSpent Int
+  attempts  Int
+
+  createdAt DateTime @default(now())
 }
